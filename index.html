@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Delta Force Recharge</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: url('https://images.unsplash.com/photo-1601391263609-2ab7364b3b36?auto=format&fit=crop&w=1650&q=80') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .recharge-box {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #00ffd5;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #00ffd5;
+            color: #000;
+            font-weight: bold;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #00c3a5;
+        }
+
+        .price-tag {
+            margin-top: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="recharge-box">
+        <h2>Delta Force Recharge</h2>
+        <form id="rechargeForm">
+            <label for="playerId">Player ID:</label>
+            <input type="text" id="playerId" placeholder="Enter your Player ID" required="required" />
+
+            <label for="deltaPoints">Delta Points:</label>
+            <select id="deltaPoints">
+                <option value="100" data-price="1.99">100 DP - ₹1.99</option>
+                <option value="500" data-price="7.99">500 DP - ₹7.99</option>
+                <option value="1000" data-price="14.99">1000 DP - ₹14.99</option>
+                <option value="2000" data-price="28.99">2000 DP - ₹28.99</option>
+            </select>
+
+            <div class="price-tag" id="priceTag">₹1.99</div>
+
+            <button type="submit">Recharge Now</button>
+        </form>
+    </div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script>
+        const form = document.getElementById("rechargeForm");
+        const deltaSelect = document.getElementById("deltaPoints");
+        const priceTag = document.getElementById("priceTag");
+
+        deltaSelect.addEventListener("change", function () {
+            const selectedOption = deltaSelect.options[deltaSelect.selectedIndex];
+            priceTag.textContent = `₹${selectedOption.getAttribute("data-price")}`;
+        });
+
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            const playerId = document.getElementById("playerId").value;
+            const deltaPoints = deltaSelect.value;
+            const price = parseFloat(deltaSelect.options[deltaSelect.selectedIndex].getAttribute("data-price"));
+
+            const options = {
+                key: "rzp_test_1DP5mmOlF5G5ag", // Razorpay test key
+                amount: price * 100,
+                currency: "INR",
+                name: "Delta Force Recharge",
+                description: `Recharge for ${deltaPoints} DP`,
+                handler: function (response) {
+                    alert(`Payment Successful!\nPayment ID: ${response.razorpay_payment_id}`);
+                },
+                notes: {
+                    player_id: playerId,
+                    delta_points: deltaPoints
+                },
+                theme: {
+                    color: "#00ffd5"
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.open();
+        });
+    </script>
+</body>
+</html>
